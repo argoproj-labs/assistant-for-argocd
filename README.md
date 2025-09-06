@@ -1,4 +1,4 @@
-![alt text](https://raw.githubusercontent.com/gnunn-gitops/argocd-assistant/llama-stack/docs/img/assistant.png)
+![alt text](https://raw.githubusercontent.com/argoproj-labs/assistant-for-argocd/main/docs/img/assistant.png)
 
 ### Introduction
 
