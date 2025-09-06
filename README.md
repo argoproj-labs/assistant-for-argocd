@@ -98,6 +98,11 @@ I have not figured out a way to develop it with live code so I use the script `.
 a running Argo CD on the cluster. Tweak the NAMESPACE and LABEL_NAME environment variables to match your instance of Argo CD. Note
 the LABEL_NAME needs to be a unique label on the Argo CD server component.
 
+# Packaging
+
+To create a new release, bump the version number in `package.json` and then run `yarn run package`. This will create
+a compressed archive in `./dist` that can be used by the Argo CD Extension Installer.
+
 # Limitations
 
 There are some limitations as follows:
