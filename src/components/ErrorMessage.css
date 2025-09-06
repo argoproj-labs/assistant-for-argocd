@@ -1,0 +1,9 @@
+.error-toast {
+    border: 1px 1px 4px 1px;
+    border-color: #363c4a #363c4a #e96d76 #363c4a;
+    border-style: inset;
+    background-color: #f8fbfb;
+}
+.error-title {
+    font-weight: bold;
+}

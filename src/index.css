@@ -1,0 +1,45 @@
+.rcb-window-embedded {
+    height: "100%"
+}
+.rcb-bot-message code {
+  font-family: monospace !important;
+}
+.rcb-bot-message ol {
+    margin-top: -1.2em;
+    margin-bottom: -1.2em;
+    padding-top: 0em;
+    padding-bottom: 0em;
+}
+.rcb-bot-message p {
+    margin-bottom: 0em
+}
+.rcb-bot-message a {
+    color: #DFF6F9;
+}
+.rcb-bot-message a:hover {
+    color: #DFF6F9;
+}
+ul {
+  line-height: normal;
+}
+ul li {
+  line-height: normal;
+  white-space-collapse: collapse;
+  margin-top: 0.4em;
+  margin-bottom: 0.4em;
+}
+ul li p {
+  line-height: normal;
+}
+ol {
+  line-height: normal;
+}
+ol li {
+  line-height: normal;
+  white-space-collapse: collapse;
+  margin-top: 0.4em;
+  margin-bottom: 0.4em;
+}
+ol li p {
+  line-height: normal;
+}
