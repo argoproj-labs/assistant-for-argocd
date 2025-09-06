@@ -11,8 +11,8 @@
     "scripts": {
         "build": "yarn clean && NODE_ENV=production yarn ts-node node_modules/.bin/webpack",
         "build-dev": "yarn clean && yarn ts-node node_modules/.bin/webpack",
-        "package": "yarn build && tar -C dist -cvf dist/extension-$npm_package_name-$npm_package_version.tar resources",
-        "package-dev": "yarn build-dev && tar -C dist -cvf dist/extension-$npm_package_name-$npm_package_version.tar resources",
+        "package": "yarn build && tar -C dist -cvf dist/extension-$npm_package_name-$npm_package_version.tar assistant",
+        "package-dev": "yarn build-dev && tar -C dist -cvf dist/extension-$npm_package_name-$npm_package_version.tar assistant",
         "clean": "rm -rf dist"
     },
     "devDependencies": {
