@@ -14,7 +14,7 @@ const config: WebpackConfiguration = {
     },
     output: {
         filename: `extensions-${extName}.js`,
-        path: __dirname + `/dist/resources/extensions-${extName}`,
+        path: __dirname + `/dist/assistant/extensions-${extName}`,
         libraryTarget: 'window',
         library: ['extensions', 'resources'],
     },

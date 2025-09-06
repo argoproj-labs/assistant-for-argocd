@@ -5,11 +5,10 @@ import MarkedWrapper from "./components/MarkedWrapper";
 import {getLogs, hasLogs, MAX_LINES} from "./service/logs";
 import { getContainers, getResourceIdentifier, isAttachRequest, isCancelRequest, QueryContextImpl } from "./util/util";
 import { Events, LogEntry } from "./model/argocd";
-import { Attachment, AttachmentType, QueryProvider, QueryResponse, AssistantSettings, Logs } from "./model/provider";
+import { Attachment, AttachmentType, QueryProvider, QueryResponse, AssistantSettings } from "./model/provider";
 import { createProvider, Provider } from "./providers/providerFactory";
 
 import "./index.css"
-import { useSessionStorage } from "react-use";
 
 // Where the chat is stored in session storage.
 const CHAT_HISTORY_KEY = "argocd-assistant-chat-history";
@@ -28,6 +27,33 @@ const LOGS_KEY = "argocd-assistant-logs";
 const CONVERSATION_ID_KEY = "argocd-assistant-conversation-id";
 
 const DATA_KEY = "argocd-assistant-data";
+
+/**
+ * Settings used for chatbotify component
+ */
+const CHAT_SETTINGS: Settings = {
+    general: {
+        showFooter: false,
+        showHeader: false,
+        embedded: true
+    },
+    fileAttachment: {
+        disabled: true
+    },
+    chatHistory: {
+        disabled: false,
+        storageKey: CHAT_HISTORY_KEY,
+        storageType: "SESSION_STORAGE",
+        // More management of state needs to be done in this extension, it basically
+        // looks every time a tab is switched the view gets re-loaded. Enabling this switch
+        // brings back the state automatically but if the user attached logs they would lose
+        // though which is confusing.
+        autoLoad: true
+    },
+    chatWindow: {
+        showScrollbar: true
+    }
+}
 
 /**
  * Add additional global item for settings
@@ -57,24 +83,6 @@ const CHAT_STYLES: Styles = {
     }
 }
 
-const AttachmentComponent = ({ logs }): JSX.Element =>  {
-    if (logs == undefined) {
-        return (
-            <div className="attachment">
-                <span>No attachment</span>
-            </div>
-        )
-    } else {
-        console.log("Attachment component");
-        console.log(logs);
-        return (
-            <div className="attachment">
-                <span className="attachment-name">Attachment: {logs.container}</span>
-            </div>
-        );
-    }
-}
-
 /**
  * The extension component that is loaded in Argo CD for the ChatBot.
  *
@@ -88,8 +96,6 @@ export const Extension = (props: any) => {
     const [provider] = React.useState<QueryProvider>(createProvider(settings.provider as Provider));
 
     console.log("Using provider: " + settings.provider);
-
-    const [logs, setLogs] = useSessionStorage<Logs>(LOGS_KEY, undefined);
 
     // Extract the resource and application passed to the extension
     const { resource, application } = props;
@@ -130,10 +136,9 @@ export const Extension = (props: any) => {
     if (currentResourceID !== resourceID) {
         sessionStorage.setItem(RESOURCE_ID_KEY, resourceID);
         sessionStorage.removeItem(CHAT_HISTORY_KEY);
+        sessionStorage.removeItem(LOGS_KEY);
         sessionStorage.removeItem(CONVERSATION_ID_KEY);
         sessionStorage.removeItem(DATA_KEY);
-        sessionStorage.removeItem(LOGS_KEY);
-        setLogs(undefined);
     }
 
     // The conversation flow for the chatbot
@@ -180,10 +185,10 @@ export const Extension = (props: any) => {
                     )
                 }
 
-                if (logs != undefined ) {
+                if (LOGS_KEY in sessionStorage ) {
                     attachments.push(
                         {
-                            content: logs.entries, //sessionStorage.getItem(LOGS_KEY),
+                            content: sessionStorage.getItem(LOGS_KEY),
                             mimeType: "application/json",
                             type: AttachmentType.LOG
                         }
@@ -252,49 +257,13 @@ export const Extension = (props: any) => {
             message: async(params) => {
                 try {
                     const result:LogEntry[] = await getLogs(application, resource, form["container"], form["lines"]);
-                    const logs:Logs = {container: form["container"], logs:JSON.stringify(result) }
-
-                    console.log("Attach Logs");
-                    console.log(logs);
-
-                    setLogs(logs);
+                    sessionStorage.setItem(LOGS_KEY, JSON.stringify(result));
                     return "Requested logs have been attached";
                 } catch (error) {
                     return "Unexpected error: " + error.message;
                 }
             },
             path: "loop"
-        }
-    }
-
-    /**
-     * Settings used for chatbotify component
-     */
-    const CHAT_SETTINGS: Settings = {
-        general: {
-            showFooter: true,
-            showHeader: false,
-            embedded: true
-        },
-        footer: {
-            text: (logs == undefined? "":AttachmentComponent(logs)),
-            buttons: []
-        },
-        fileAttachment: {
-            disabled: true
-        },
-        chatHistory: {
-            disabled: false,
-            storageKey: CHAT_HISTORY_KEY,
-            storageType: "SESSION_STORAGE",
-            // More management of state needs to be done in this extension, it basically
-            // looks every time a tab is switched the view gets re-loaded. Enabling this switch
-            // brings back the state automatically but if the user attached logs they would lose
-            // though which is confusing.
-            autoLoad: true
-        },
-        chatWindow: {
-            showScrollbar: true
         }
     }
 
@@ -319,9 +288,7 @@ export const Extension = (props: any) => {
       }, [application, resource, application_name]);
 
     return (
-        <div>
-            <ChatBot plugins={plugins} settings={CHAT_SETTINGS} styles={CHAT_STYLES} flow={flow} />
-        </div>
+    <ChatBot plugins={plugins} settings={CHAT_SETTINGS} styles={CHAT_STYLES} flow={flow} />
     );
 
 }
