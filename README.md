@@ -30,10 +30,11 @@ metadata:
 spec:
   rbac:
     ...
-    # This is needed to allow the extensiont to communicate with the proxy-extension
+    # This is needed to allow the extension to communicate with the proxy-extension
     # defined in extraConfig. Note the name `assistant` must match the proxy-extension
     # name.
     p, role:readonly, extensions, invoke, assistant, allow
+  # Configuration items that are placed in
   extraConfig:
     # Define the extension end point
     extension.config.assistant: |
@@ -44,7 +45,9 @@ spec:
       services:
         # Note if you use HTTPS it needs to be a valid certificate or the CA
         # needs to be installed in the server component otherwise the
-        # Argo CD Proxy Extension will fail
+        # Argo CD Proxy Extension will fail.
+        #
+        # Adjust this URL to wherever you have llama-stack installed.
       - url: http://llamastack.llamastack.svc.cluster.local:8321
   server:
     # Enabled proxy extensions in the server component
@@ -54,7 +57,7 @@ spec:
     initContainers:
       - env:
           - name: EXTENSION_URL
-            value: "https://github.com/gnunn-gitops/argocd-assistant/releases/download/0.4.1/extension-asistant-x.y.z.tar"
+            value: "https://github.com/argoproj-labs/assistant-for-argocd/releases/download/v0.1.0/extension-assistant-0.1.0.tar"
         image: "quay.io/argoprojlabs/argocd-extension-installer:v0.0.8"
         name: extension-assistant
         securityContext:
