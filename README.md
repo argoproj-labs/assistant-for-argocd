@@ -120,3 +120,9 @@ streaming, a work-around by the extension of setting the ContentLength header to
 
 4. If the provider is using self-signed TLS you will need to inject the certs into the Argo CD server for trust.
 
+# Thanks
+
+Thanks to the folks who work on the [react-chatbotify](https://react-chatbotify.com) component, it provides a lot of the capabilities used
+here and is an excellent open source component. If you need to provide a chatbot in a React interface
+its well worth checking out.
+
