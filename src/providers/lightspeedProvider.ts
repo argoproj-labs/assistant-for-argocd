@@ -37,14 +37,18 @@ type LightspeedQueryRequest = {
 
 export class LightspeedProvider implements QueryProvider {
 
-    private _CONVERSATION_ID:string = uuidv4();
+    private _CONVERSATION_ID:string;
 
     setContext(context: QueryContext) {
-        // Do nothing, lightspeed does not require anything on reset
+        this._CONVERSATION_ID = context.conversationID;
         return;
     }
 
     async query(context: QueryContext, prompt: string, params: Params): Promise<QueryResponse> {
+
+        if (this._CONVERSATION_ID == undefined || this._CONVERSATION_ID == "") {
+            this._CONVERSATION_ID = uuidv4();
+        }
 
         const lqr: LightspeedQueryRequest = {
             conversation_id: this._CONVERSATION_ID,
@@ -98,7 +102,7 @@ export class LightspeedProvider implements QueryProvider {
                 await params.streamMessage(text);
             }
 
-            return { success: true, conversationID: "" }
+            return { success: true, conversationID: this._CONVERSATION_ID }
         } catch (error) {
             console.error('An error occurred:', error);
             throw error;
