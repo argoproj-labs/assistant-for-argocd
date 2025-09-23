@@ -1,5 +1,4 @@
-// Basic settings that assume you have a simple LLama Stack deployment using the OpenAI inference engine
-// Basic settings that assume you have a simple LLama Stack deployment using the OpenAI inference engine
+// Basic settings example for Lightspeed. It shows using a Deepseek model with Red Hat's internal MaaS using RHOAI
 var argocdAssistantSettings = {
     provider: "Lightspeed",
     model: "r1-qwen-14b-w4a16",
