@@ -1,5 +1,6 @@
 import { Params } from "react-chatbotify";
 import { Attachment, AttachmentType, QueryContext, QueryProvider, QueryResponse } from "../model/provider";
+import {v4 as uuidv4} from 'uuid';
 
 const URL: string = 'https://' + location.host + "/extensions/lightspeed/v1/streaming_query"
 const ContentType = {
@@ -36,6 +37,8 @@ type LightspeedQueryRequest = {
 
 export class LightspeedProvider implements QueryProvider {
 
+    private _CONVERSATION_ID:string = uuidv4();
+
     setContext(context: QueryContext) {
         // Do nothing, lightspeed does not require anything on reset
         return;
@@ -44,7 +47,7 @@ export class LightspeedProvider implements QueryProvider {
     async query(context: QueryContext, prompt: string, params: Params): Promise<QueryResponse> {
 
         const lqr: LightspeedQueryRequest = {
-            conversation_id: "",
+            conversation_id: this._CONVERSATION_ID,
             attachments: context.attachments.map<LightspeedAttachment>((item: Attachment) => {
                 return {
                     content: item.content,
