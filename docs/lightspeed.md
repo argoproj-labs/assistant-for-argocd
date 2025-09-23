@@ -46,7 +46,7 @@ spec:
 ```
 
 2. Lightspeed requires an OpenShift token, in the console it uses the user's token but Argo CD UI does not have this token. As a result
-we will create a ServiceAccount and then create a token against that. To do so create the following secret:
+we will create a ServiceAccount and then create a token against that. To do so create the following ServiceAccount and Secret:
 
 ```
 kind: ServiceAccount
@@ -65,7 +65,7 @@ type: kubernetes.io/service-account-token
 ```
 
 3. You will need to copy the token into the argocd-secret with the key `argocd-secret`. If you want to do this
-in a GitOps way you an use ExternalSecrets to take the secret from step 2 and insert it into the
+in a GitOps way you use ExternalSecrets to take the secret from step 2 and insert it into the
 existing `argocd-secret` as per this [example](https://github.com/gnunn-gitops/acm-hub-bootstrap/blob/main/components/policies/gitops/base/manifests/gitops-lightspeed/base/lightspeed-external-secret.yaml).
 
 4. Add a ClusterRoleBinding to allow the `lightspeed-auth` service account to call the Lightspeed API, again adjust as needed
@@ -86,7 +86,9 @@ subjects:
   namespace: openshift-gitops
 ```
 
-5. The extension talks to the Lightspeed Kubernetes service, you will need the Service CA for the Argo CD proxy extension to trust it.
+5. The extension talks to the Lightspeed Kubernetes service which uses TLS provided
+by the OpenShift [Service CA Operator](https://docs.redhat.com/en/documentation/openshift_container_platform/4.19/html/security_and_compliance/certificate-types-and-descriptions#cert-types-service-ca-certificates),
+you will need the Service CA for the Argo CD proxy extension to trust it.
 
 ```
 apiVersion: v1
