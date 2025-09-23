@@ -1,4 +1,5 @@
 // Basic settings example for Lightspeed. It shows using a Deepseek model with Red Hat's internal MaaS using RHOAI
+// Note the model and data.provider are optional, if not specified it will use the defaults configured in OLSConfig.
 var argocdAssistantSettings = {
     provider: "Lightspeed",
     model: "r1-qwen-14b-w4a16",
