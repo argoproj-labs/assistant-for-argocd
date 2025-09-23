@@ -32,6 +32,9 @@ const DATA_KEY = "argocd-assistant-data";
  * Settings used for chatbotify component
  */
 const CHAT_SETTINGS: Settings = {
+    botBubble: {
+        simulateStream: true
+    },
     general: {
         showFooter: false,
         showHeader: false,
