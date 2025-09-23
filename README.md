@@ -15,9 +15,8 @@ feature to avoid CORS issues.
 
 # Providers
 
-The extension has been designed to support pluggable query providers however at the moment there is a single
-provider for llama-stack. In the future a second provider will be added for OpenShift's Lightspeed back-end
-and contributions for additional providers are certainly welcome.
+The extension has been designed to support pluggable query providers with Llama-Stack and OpenShift Lightspeed
+as the supported back-end providers. Contributions welcome for additional providers!
 
 # Configuration
 
@@ -27,7 +26,7 @@ See the documentation on [Settings](https://github.com/argoproj-labs/assistant-f
 
 To install the Extension see the Provider specific documentation:
 
-* [Llama-stack](https://github.com/argoproj-labs/assistant-for-argocd/blob/main/docs/llama-stack.md)
+* [Llama-Stack](https://github.com/argoproj-labs/assistant-for-argocd/blob/main/docs/llama-stack.md)
 * [Lightspeed](https://github.com/argoproj-labs/assistant-for-argocd/blob/main/docs/lightspeed.md)
 
 
