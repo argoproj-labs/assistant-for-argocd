@@ -146,20 +146,21 @@ export const Extension = (props: any) => {
         start: {
             message: (params) => {
                 if (!(CHAT_HISTORY_KEY in sessionStorage)) {
-                    params.injectMessage("How can I help you with the resource '" +
+                    params.injectMessage("How can I help you with the resource **" +
                                           resource_name +
-                                          "' of type " +
+                                          "** of type " +
                                           resource_kind + "?" +
-                                          ( hasLogs(resource) ? " I notice this resource has logs available, to attach one or more container logs type 'Attach' at any time.": ""));
+                                          ( hasLogs(resource) ? " I notice this resource has logs available, to attach one or more container logs type *Attach* at any time.": ""));
                 }
             },
+            renderMarkdown: ["BOT"],
             path: async (params) => {
                 if (isAttachRequest(params.userInput) && hasLogs(resource)) {
                     return "attach"
                 } else if (isAttachRequest(params.userInput)) return "no_attach"
                 else return "loop"
             }
-        },
+        } as MarkdownRendererBlock,
         loop: {
             message: async (params) => {
 
