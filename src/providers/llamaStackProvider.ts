@@ -12,6 +12,8 @@ export class LlamaStackProvider implements QueryProvider {
 
     private _model: string;
 
+    private _client: LlamaStackClient;
+
     setContext(context: QueryContext) {
 
         // Do nothing, llamastack does not require anything on reset
@@ -20,28 +22,35 @@ export class LlamaStackProvider implements QueryProvider {
 
     async query(context: QueryContext, prompt:string, params: Params): Promise<QueryResponse> {
 
-        const client = new LlamaStackClient({
-            baseURL: URL,
-            defaultHeaders: this.getHeaders(context.application),
-        });
+        var agentID: string;
+        var sessionID: string;
+
+        if (this._client == undefined || context.conversationID == undefined) {
+            this._client = new LlamaStackClient({
+                baseURL: URL,
+                defaultHeaders: this.getHeaders(context.application),
+            });
+            const agentConfig = this.getAgentConfig(this._model);
+
+            const agent = await this._client.agents.create({ agent_config: agentConfig });
+            agentID = agent.agent_id
+
+            //Replace `assistant` with resource name longer term
+            const session = await this._client.agents.session.create(agentID, { session_name: 'assistant' });
+            sessionID = session.session_id;
+        } else {
+            sessionID = context.conversationID;
+            agentID = context.data.agentID;
+        }
 
         if (this._model == undefined) {
-            this._model = await this.getModel(client, context);
+            this._model = await this.getModel(this._client, context);
             if (this._model == undefined) {
                 return {success: false, error:{status:404, message:"No models are configured or available in LLamaStack"}};
             }
         }
 
-        const agentConfig = this.getAgentConfig(this._model);
-
-        const agent = await client.agents.create({ agent_config: agentConfig });
-        const agentID = agent.agent_id
-
-        //Replace `assistant` with resource name longer term
-        const session = await client.agents.session.create(agentID, { session_name: 'assistant' });
-        const sessionID = session.session_id;
-
-        const response = await client.agents.turn.create(
+        const response = await this._client.agents.turn.create(
             agentID,
             sessionID,
             {
@@ -79,7 +88,7 @@ export class LlamaStackProvider implements QueryProvider {
         }
         //console.log(text);
 
-        return {success:true, conversationID: sessionID}
+        return {success:true, conversationID: sessionID, data: {agentID: agentID}}
     }
 
     /**
