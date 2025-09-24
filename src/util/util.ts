@@ -36,11 +36,11 @@ export type Events = {
 export class QueryContextImpl implements QueryContext {
     private _application: any;
     private _conversationID: string;
-    private _data: any;
+    private _data: string;
     private _attachments: Attachment[];
     private _settings: AssistantSettings;
 
-    constructor(application: any, conversationID: string, data: any, attachments: Attachment[], settings: AssistantSettings) {
+    constructor(application: any, conversationID: string, data: string, attachments: Attachment[], settings: AssistantSettings) {
         this._application = application;
         this._conversationID = conversationID;
         this._data = data;

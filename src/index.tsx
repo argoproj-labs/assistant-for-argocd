@@ -201,14 +201,11 @@ export const Extension = (props: any) => {
 
                 const context = new QueryContextImpl(application, conversationID, data, attachments, settings);
 
-                console.log(context);
-
                 try {
                     const response: QueryResponse = await provider.query(context, params.userInput, params );
                     if (response.conversationID !== undefined) sessionStorage.setItem(CONVERSATION_ID_KEY, response.conversationID);
                     if (response.data !== undefined) sessionStorage.setItem(DATA_KEY, response.data);
                 } catch (error) {
-                    console.log(error);
                     return "Unexpected Error: " + error.message + "";
                 }
 

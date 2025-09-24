@@ -125,7 +125,7 @@ export type QueryResponse = {
      * Any additional data for maintaining state that the
      * provider requires.
      */
-    data?: any
+    data?: string
 
     /**
      * If an error occurred return it here

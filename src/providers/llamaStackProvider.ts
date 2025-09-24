@@ -30,6 +30,14 @@ export class LlamaStackProvider implements QueryProvider {
                 baseURL: URL,
                 defaultHeaders: this.getHeaders(context.application),
             });
+
+            if (this._model == undefined) {
+                this._model = await this.getModel(this._client, context);
+                if (this._model == undefined) {
+                    return {success: false, error:{status:404, message:"No models are configured or available in LLamaStack"}};
+                }
+            }
+
             const agentConfig = this.getAgentConfig(this._model);
 
             const agent = await this._client.agents.create({ agent_config: agentConfig });
@@ -40,14 +48,7 @@ export class LlamaStackProvider implements QueryProvider {
             sessionID = session.session_id;
         } else {
             sessionID = context.conversationID;
-            agentID = context.data.agentID;
-        }
-
-        if (this._model == undefined) {
-            this._model = await this.getModel(this._client, context);
-            if (this._model == undefined) {
-                return {success: false, error:{status:404, message:"No models are configured or available in LLamaStack"}};
-            }
+            agentID = context.data;
         }
 
         const response = await this._client.agents.turn.create(
@@ -86,9 +87,8 @@ export class LlamaStackProvider implements QueryProvider {
                 }
             }
         }
-        //console.log(text);
 
-        return {success:true, conversationID: sessionID, data: {agentID: agentID}}
+        return {success:true, conversationID: sessionID, data: agentID}
     }
 
     /**
