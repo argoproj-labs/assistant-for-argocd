@@ -37,21 +37,17 @@ type LightspeedQueryRequest = {
 
 export class LightspeedProvider implements QueryProvider {
 
-    private _CONVERSATION_ID:string;
-
     setContext(context: QueryContext) {
-        this._CONVERSATION_ID = context.conversationID;
         return;
     }
 
     async query(context: QueryContext, prompt: string, params: Params): Promise<QueryResponse> {
 
-        if (this._CONVERSATION_ID == undefined || this._CONVERSATION_ID == "") {
-            this._CONVERSATION_ID = uuidv4();
-        }
+        const conversationID:string = context.conversationID == undefined ? uuidv4(): context.conversationID;
+
 
         const lqr: LightspeedQueryRequest = {
-            conversation_id: this._CONVERSATION_ID,
+            conversation_id: conversationID,
             attachments: context.attachments.map<LightspeedAttachment>((item: Attachment) => {
                 return {
                     content: item.content,
@@ -102,7 +98,7 @@ export class LightspeedProvider implements QueryProvider {
                 await params.streamMessage(text);
             }
 
-            return { success: true, conversationID: this._CONVERSATION_ID }
+            return { success: true, conversationID: conversationID }
         } catch (error) {
             console.error('An error occurred:', error);
             throw error;
