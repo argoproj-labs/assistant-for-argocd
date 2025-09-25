@@ -73,9 +73,18 @@ for your Argo CD instance(s).
 
 ```
 apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: token-reviewer
+rules:
+- apiGroups: ["authentication.k8s.io"]
+  resources: ["tokenreviews"]
+  verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: argocd-assistant-lightspeed
+  name: argocd-assistant-gitops-access
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -84,6 +93,19 @@ subjects:
 - kind: ServiceAccount
   name: lightspeed-auth
   namespace: openshift-gitops
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: lightspeed-auth-token-reviewer
+subjects:
+  - kind: ServiceAccount
+    name: lightspeed-auth
+    namespace: openshift-gitops
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: token-reviewer
 ```
 
 5. The extension talks to the Lightspeed Kubernetes service which uses TLS provided
