@@ -37,6 +37,7 @@ are as follows:
 | provider  | Yes  | If you provide a Settings object you must specify the back-end [Provider](https://github.com/argoproj-labs/assistant-for-argocd/blob/main/src/providers/providerFactory.ts#L6) to use. |
 | model  | No  | This specifies the model you want to use. If not specified the Provider will attempt to use a reasonable default. |
 | data   | No  | Provider specific configuration, see docs for the Provider you are using. |
+| maximumLogLines | No | The maximum number of lines from the log that a user is permitted to attach to the context. Note that this impacts any token quota in place, increase with care. |
 
 ### Creating Extension
 

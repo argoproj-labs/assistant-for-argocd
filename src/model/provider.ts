@@ -24,6 +24,14 @@ export type AssistantSettings = {
      * Provider specific data, can be omitted if none needed.
      */
     data?: any;
+
+    /**
+     * The maximum number of lines to allow users to attach. Note
+     * that these count against whatever token quota is in place and
+     * thus making this too large may result in quota exceeded error
+     * messages.
+     */
+    maximumLogLines?: number;
 }
 
 export interface Logs {
