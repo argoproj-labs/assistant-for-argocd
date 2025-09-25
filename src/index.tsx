@@ -129,7 +129,7 @@ export const Extension = (props: any) => {
     const currentResourceID = sessionStorage.getItem(RESOURCE_ID_KEY)
     const resourceID = getResourceIdentifier(resource);
 
-    const maxLogLines:number = (argocdAssistantSettings != undefined && argocdAssistantSettings.maximumLogLines != undefined ? argocdAssistantSettings.maximumLogLines : MAX_LINES);
+    const maxLogLines:number = (settings.maximumLogLines != undefined ? settings.maximumLogLines : MAX_LINES);
 
     // If a new resource update caches. This is used to handle
     // how Argo CD reloads extension tab when tab switching on resource view.
