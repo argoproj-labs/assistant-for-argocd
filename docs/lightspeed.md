@@ -75,11 +75,11 @@ for your Argo CD instance(s).
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: gitops-cluster-admin
+  name: argocd-assistant-lightspeed
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: cluster-admin
+  name: lightspeed-operator-query-access
 subjects:
 - kind: ServiceAccount
   name: lightspeed-auth
