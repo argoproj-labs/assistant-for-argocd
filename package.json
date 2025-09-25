@@ -36,7 +36,7 @@
         "dompurify": "^3.2.6",
         "llama-stack-client": "github:llamastack/llama-stack-client-typescript",
         "marked": "^15.0.12",
-        "react-chatbotify": "^2.3.0",
+        "react-chatbotify": "^2.3.2",
         "react-use": "^17.6.0",
         "typescript": "^4.9.3",
         "uuid": "^11.1.0",
