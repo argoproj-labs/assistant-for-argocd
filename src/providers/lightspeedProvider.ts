@@ -2,7 +2,7 @@ import { Params } from "react-chatbotify";
 import { Attachment, AttachmentType, QueryContext, QueryProvider, QueryResponse } from "../model/provider";
 import {v4 as uuidv4} from 'uuid';
 
-const URL: string = 'https://' + location.host + "/extensions/lightspeed/v1/streaming_query"
+const URL: string = 'https://' + location.host + "/extensions/assistant/v1/streaming_query"
 const ContentType = {
     APPLICATION_JSON: 'application/json',
     APPLICATION_XML: 'application/xml',
