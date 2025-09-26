@@ -42,7 +42,7 @@ spec:
     initContainers:
       - env:
           - name: EXTENSION_URL
-            value: "https://github.com/argoproj-labs/assistant-for-argocd/releases/download/v0.2.1/extension-assistant-0.2.1.tar"
+            value: "https://github.com/argoproj-labs/assistant-for-argocd/releases/download/v0.2.2/extension-assistant-0.2.2.tar"
         image: "quay.io/argoprojlabs/argocd-extension-installer:v0.0.8"
         name: extension-assistant
         securityContext:
