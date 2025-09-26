@@ -1,7 +1,5 @@
 ### Installation
 
-### Installing POC on Existing Cluster
-
 *Prerequistes*: You muse have the OpenShift Lightspeed operator installed and configured on the cluster.
 
 1. In the `openshift-lightspeed` namespace create a new NetworkPolicy to allow the Argo CD extension to talk
