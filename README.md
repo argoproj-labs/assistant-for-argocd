@@ -13,6 +13,12 @@ through a guided conversation flow.
 To call llama-stack this uses the [Argo CD Proxy Extension](https://argo-cd.readthedocs.io/en/stable/developer-guide/extensions/proxy-extensions)
 feature to avoid CORS issues.
 
+# Demo
+
+An interactive video demo is available:
+
+https://interact.redhat.com/share/xWi5je6tPnJe4dcspahl
+
 # Providers
 
 The extension has been designed to support pluggable query providers with Llama-Stack and OpenShift Lightspeed
