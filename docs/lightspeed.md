@@ -121,7 +121,11 @@ metadata:
 data: {}
 ```
 
-6. Install the extension into the Argo CD instance by adding the following in the appropriate spots:
+6. By default the assistant uses the llama-stack extension, to have it use Lightspeed you will need to
+create a second assistant with the Lightspeed settings. You can view an example [here](https://github.com/gnunn-gitops/argocd-assistant-settings).
+
+7. Install the extension into the Argo CD instance by adding the following in the appropriate spots, update the settings to point to
+your Lightspeed settings extension:
 
 ```
 apiVersion: argoproj.io/v1beta1
@@ -132,9 +136,9 @@ metadata:
 spec:
   rbac:
     ...
-    p, role:readonly, extensions, invoke, lightspeed, allow
+    p, role:readonly, extensions, invoke, assistant, allow
   extraConfig:
-    extension.config.lightspeed: |
+    extension.config.assistant: |
       connectionTimeout: 2s
       keepAlive: 360s
       idleConnectionTimeout: 360s
@@ -155,12 +159,22 @@ spec:
           - name: EXTENSION_URL
             value: "https://github.com/argoproj-labs/assistant-for-argocd/releases/download/v0.2.2/extension-assistant-0.2.2.tar"
         image: "quay.io/argoprojlabs/argocd-extension-installer:v0.0.8"
-        name: extension-lightspeed
+        name: extension-assistant
         securityContext:
           allowPrivilegeEscalation: false
         volumeMounts:
           - name: extensions
             mountPath: /tmp/extensions/
+      - env:
+          - name: EXTENSION_URL
+            value: <your-settings>.tar
+        image: 'quay.io/argoprojlabs/argocd-extension-installer:v0.0.8'
+        name: extension-assistant-settings
+        securityContext:
+          allowPrivilegeEscalation: false
+        volumeMounts:
+          - mountPath: /tmp/extensions/
+            name: extensions
     volumeMounts:
       - mountPath: /etc/pki/tls/certs/service-ca.crt
         name: config-service-cabundle
