@@ -1,6 +1,7 @@
 ### Installation
 
 *Prerequistes*: You muse have the OpenShift Lightspeed operator installed and configured on the cluster.
+For detailed steps, refer [Lightspeed and OpenShift GitOps Installation and Configuration Guide](lightspeed-install-configure.md).
 
 1. In the `openshift-lightspeed` namespace create a new NetworkPolicy to allow the Argo CD extension to talk
 to the Lightspeed service. This is required because Lightspeed has a default NetworkPolicy that will
@@ -57,12 +58,21 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: lightspeed-auth-secret
+  namespace: openshift-gitops
   annotations:
     kubernetes.io/service-account.name: lightspeed-auth
 type: kubernetes.io/service-account-token
 ```
 
-3. You will need to copy the token into the argocd-secret with the key `argocd-secret`. If you want to do this
+3. You will need to copy the token into the argocd-secret with the key `argocd-secret`. 
+##### Option 1: Using oc client
+```
+ENCODED_OLS_TOKEN=$(echo "Bearer $(oc get secret lightspeed-auth-secret -n openshift-gitops -o jsonpath='{.data.token}' | base64 -d)" | base64 -w0)
+```
+```
+oc patch secret argocd-secret -n openshift-gitops -p "{\"data\":{\"lightspeed.auth.header\": \"${ENCODED_OLS_TOKEN}\"}}"
+```
+##### Option 2: GitOps Way
 in a GitOps way you use ExternalSecrets to take the secret from step 2 and insert it into the
 existing `argocd-secret` as per this [example](https://github.com/gnunn-gitops/acm-hub-bootstrap/blob/main/components/policies/gitops/base/manifests/gitops-lightspeed/base/lightspeed-external-secret.yaml).
 
@@ -117,7 +127,7 @@ metadata:
   name: config-service-cabundle
   namespace: openshift-gitops
   annotations:
-    service.beta.openshift.io/inject-cabundle: true
+    service.beta.openshift.io/inject-cabundle: "true"
 data: {}
 ```
 
@@ -179,12 +189,50 @@ spec:
       - mountPath: /etc/pki/tls/certs/service-ca.crt
         name: config-service-cabundle
         subPath: service-ca.crt
+      - mountPath: /tmp/extensions/
+        name: extensions
     volumes:
       - configMap:
           name: config-service-cabundle
           defaultMode: 420
         name: config-service-cabundle
         optional: true
+      - name: extensions
+        emptyDir: {}
 ```
 
 7. The llama-stack provider is the default, you will need to create a Lightspeed settings extension to use Lightspeed as the backend. An example of the settings can be found [here](https://github.com/argoproj-labs/assistant-for-argocd/blob/main/examples/settings/lightspeed/extension-basic-settings.js).
+
+8. Create a destination namespace and deploy the guestbook application
+```
+oc create ns guestbook
+oc label ns guestbook argocd.argoproj.io/managed-by=openshift-gitops
+```
+
+```
+oc create -f - <<EOF
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: default
+  namespace: openshift-gitops
+spec: {}
+```
+```
+oc create -f - <<EOF
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: guestbook
+  namespace: openshift-gitops
+spec:
+  source:
+    repoURL: https://github.com/anandf/argocd-example-apps.git
+    path: helm-guestbook
+    revision: HEAD
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: guestbook
+EOF
+```
