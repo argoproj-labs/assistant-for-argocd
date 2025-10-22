@@ -1,6 +1,7 @@
 ## Lightspeed and OpenShift GitOps Installation and Configuration Guide
 ### Prerequisites
 - OpenShift Cluster with v4.19 or later
+- The OpenShift CLI binary (oc) is installed and available in your system's PATH.
 
 ### Installation of OpenShift LightSpeed (OLS)
 
