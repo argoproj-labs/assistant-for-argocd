@@ -36,6 +36,7 @@ export class LlamaStackProvider implements QueryProvider {
                 if (this._model == undefined) {
                     return {success: false, error:{status:404, message:"No models are configured or available in LLamaStack"}};
                 }
+                console.log("Using model: " + this._model);
             }
 
             const agentConfig = this.getAgentConfig(this._model);

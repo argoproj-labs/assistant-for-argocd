@@ -73,13 +73,13 @@ export class QueryContextImpl implements QueryContext {
 // for caching
 export function getResourceIdentifier(resource: any): string {
     if (resource == undefined) return "Undefined";
-    console.log(resource);
+    //console.log(resource);
 
     const namespace = resource.metadata.namespace != undefined ? resource.metadata.namespace : "";
     const version = resource.apiVersion != undefined ? resource.apiVersion.replace(/\//g, "-") : "";
     const kind = resource.kind != undefined ? resource.kind : "";
 
-    console.log("Kind:" + kind);
+    //console.log("Kind:" + kind);
 
     return version + "-" + kind + "-" + namespace + "-" + resource.metadata.name;
 }
@@ -122,7 +122,7 @@ export function isCancelRequest(input: string): boolean {
 
 export function getHeaders(application: any, streaming: boolean): Headers {
 
-    console.log(application);
+    //console.log(application);
 
     const applicationName = application?.metadata?.name || "";
     const applicationNamespace = application?.metadata?.namespace || "";
