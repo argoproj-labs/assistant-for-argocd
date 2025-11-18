@@ -95,7 +95,9 @@ export const Extension = (props: any) => {
     // Form used for guided conversation flow to load logs
     const [provider] = React.useState<QueryProvider>(createProvider(settings.provider as Provider));
 
-    console.log("Using provider: " + settings.provider);
+    React.useEffect(() => {
+        console.log("Using provider: " + settings.provider);
+    }, []);
 
     // Extract the resource and application passed to the extension
     const { resource, application } = props;

@@ -102,8 +102,6 @@ export class LlamaStackProvider implements QueryProvider {
      */
     async getModel(client: LlamaStackClient, context: QueryContext): Promise<string> {
 
-        if (context.settings.model != undefined) return context.settings.model;
-
         // Simple implementation to use first available model if one wasn't configured
         const availableModels = (await client.models.list())
             .filter((model: any) =>
@@ -113,10 +111,19 @@ export class LlamaStackProvider implements QueryProvider {
             )
             .map((model: any) => model.identifier);
 
+        console.log("Available Models from Llama-Stack");
         console.log(availableModels);
 
-        if (availableModels.length === 0) {
-            console.log('No available models. Exiting.');
+        // Check if the selected model is actually available in Llama-Stack
+        // At this time only provide
+        if (context.settings.model != undefined) {
+            console.log("Configured model is %s", context.settings.model)
+            if (!availableModels.includes(context.settings.model)) {
+                console.warn("The selected model %s defined in settings is not available in the list of models reported by Llama-Stack", context.settings.model);
+            }
+            return context.settings.model;
+        } else if (availableModels.length === 0) {
+            console.warn('No available models in llama-stack available for use.');
             return undefined;
         } else {
             return availableModels[0];
