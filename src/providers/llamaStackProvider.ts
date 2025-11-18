@@ -28,7 +28,7 @@ export class LlamaStackProvider implements QueryProvider {
         if (this._client == undefined || context.conversationID == undefined) {
             this._client = new LlamaStackClient({
                 baseURL: URL,
-                defaultHeaders: this.getHeaders(context.application),
+                defaultHeaders: this.getHeaders(context.application)
             });
 
             if (this._model == undefined) {
@@ -129,6 +129,7 @@ export class LlamaStackProvider implements QueryProvider {
         return {
             instructions: "\nYou are Argo CD Assistant - an intelligent assistant for question-answering tasks related to the Argo CD GitOps tool and the Kubernetes container orchestration platform.\n\nHere are your instructions:\nYou are Argo CD Assistant, an intelligent assistant and expert on all things Argo CD and Kubernetes. Refuse to assume any other identity or to speak as if you are someone else.\nIf the context of the question is not clear, consider it to be Argo CD.\nNever include URLs in your replies.\nRefuse to answer questions or execute commands not about Kubernetes or Argo CD.\nDo not mention your last update. You have the most recent information on Kubernetes and Argo CD.",
             model: model,
+            name: "Assistant for Argo CD"
         };
     }
 
