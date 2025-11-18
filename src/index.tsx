@@ -207,6 +207,13 @@ export const Extension = (props: any) => {
 
                 try {
                     const response: QueryResponse = await provider.query(context, params.userInput, params );
+                    if (!response.success) {
+                        if (response.error !== undefined) {
+                            return "Unexpected Error: " + response.error.message;
+                        } else {
+                            return "Unexpected Failure: No additional information provided";
+                        }
+                    }
                     if (response.conversationID !== undefined) sessionStorage.setItem(CONVERSATION_ID_KEY, response.conversationID);
                     if (response.data !== undefined) sessionStorage.setItem(DATA_KEY, response.data);
                 } catch (error) {

@@ -8,6 +8,12 @@ import { TurnCreateParams, TurnResponseEventPayload } from "llama-stack-client/r
 
 const URL: string = 'https://' + location.host + "/extensions/assistant"
 
+interface AgentTurnErrorStreamChunk {
+    error: {
+        message: string
+    }
+}
+
 export class LlamaStackProvider implements QueryProvider {
 
     private _model: string;
@@ -73,6 +79,12 @@ export class LlamaStackProvider implements QueryProvider {
 
         let text = "";
         for await (const chunk of response) {
+            console.log(chunk);
+            if (chunk.event === undefined) {
+                const error: AgentTurnErrorStreamChunk = (chunk as unknown) as AgentTurnErrorStreamChunk;
+                console.error(error);
+                return {success: false, error:{status:500, message: error.error.message}};
+            }
             switch (chunk.event.payload.event_type) {
                 case "step_start": {
                     break;
