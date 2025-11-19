@@ -5,6 +5,9 @@ import { Attachment, QueryContext, QueryProvider, QueryResponse } from "../model
 import { AgentConfig } from "llama-stack-client/resources/shared";
 import LlamaStackClient from 'llama-stack-client';
 import { TurnCreateParams, TurnResponseEventPayload } from "llama-stack-client/resources/agents/turn";
+import { getModel } from "../util/llamastack";
+import { getMappedHeaders } from "../util/util";
+import { INSTRUCTIONS } from "./const";
 
 const URL: string = 'https://' + location.host + "/extensions/assistant"
 
@@ -32,13 +35,14 @@ export class LlamaStackProvider implements QueryProvider {
         var sessionID: string;
 
         if (this._client == undefined || context.conversationID == undefined) {
+
             this._client = new LlamaStackClient({
                 baseURL: URL,
-                defaultHeaders: this.getHeaders(context.application)
+                defaultHeaders: getMappedHeaders(context.application, true)
             });
 
             if (this._model == undefined) {
-                this._model = await this.getModel(this._client, context);
+                this._model = await getModel(this._client, context);
                 if (this._model == undefined) {
                     return {success: false, error:{status:404, message:"No models are configured or available in LLamaStack"}};
                 }
@@ -104,72 +108,13 @@ export class LlamaStackProvider implements QueryProvider {
         return {success:true, conversationID: sessionID, data: agentID}
     }
 
-    /**
-     * Fetches the model to use, right now defaults based on first
-     * available model that llama-stack returns but this needs to be
-     * made configurable.
-     *
-     * @param client llama-stack client
-     * @returns
-     */
-    async getModel(client: LlamaStackClient, context: QueryContext): Promise<string> {
-
-        // Simple implementation to use first available model if one wasn't configured
-        const availableModels = (await client.models.list())
-            .filter((model: any) =>
-                model.model_type === 'llm' &&
-                !model.identifier.includes('guard') &&
-                !model.identifier.includes('405')
-            )
-            .map((model: any) => model.identifier);
-
-        console.log("Available Models from Llama-Stack");
-        console.log(availableModels);
-
-        // Check if the selected model is actually available in Llama-Stack
-        // At this time only provide
-        if (context.settings.model != undefined) {
-            console.log("Configured model is %s", context.settings.model)
-            if (!availableModels.includes(context.settings.model)) {
-                console.warn("The selected model %s defined in settings is not available in the list of models reported by Llama-Stack", context.settings.model);
-            }
-            return context.settings.model;
-        } else if (availableModels.length === 0) {
-            console.warn('No available models in llama-stack available for use.');
-            return undefined;
-        } else {
-            return availableModels[0];
-        }
-    }
-
     // TODO: This needs to be configurable
     getAgentConfig(model: string): AgentConfig {
 
         return {
-            instructions: "\nYou are Argo CD Assistant - an intelligent assistant for question-answering tasks related to the Argo CD GitOps tool and the Kubernetes container orchestration platform.\n\nHere are your instructions:\nYou are Argo CD Assistant, an intelligent assistant and expert on all things Argo CD and Kubernetes. Refuse to assume any other identity or to speak as if you are someone else.\nIf the context of the question is not clear, consider it to be Argo CD.\nNever include URLs in your replies.\nRefuse to answer questions or execute commands not about Kubernetes or Argo CD.\nDo not mention your last update. You have the most recent information on Kubernetes and Argo CD.",
+            instructions: INSTRUCTIONS,
             model: model,
             name: "Assistant for Argo CD"
         };
     }
-
-
-    getHeaders(application: any): Record<string, string> {
-
-        const applicationName = application?.metadata?.name || "";
-        const applicationNamespace = application?.metadata?.namespace || "";
-        const project = application?.spec?.project || "";
-
-        const headers: Record<string, string> = {
-            'Origin': 'https://' + location.host,
-            "Argocd-Application-Name": `${applicationNamespace}:${applicationName}`,
-            "Argocd-Project-Name": `${project}`,
-            // Needed to get golang's reverse proxy that the Argo CD Extension proxy uses to
-            // flush immediately.
-            // https://github.com/golang/go/issues/41642
-            "Content-Length": '-1'
-        };
-
-        return headers;
-    }
-
 }

@@ -8,7 +8,9 @@ NAMESPACE=demo-gitops
 LABEL_NAME=argocd-server
 
 # The Settings file to use, this is installed as a second extension
-SETTINGS=examples/settings/llama-stack/extension-basic-settings.js
+# SETTINGS=examples/settings/llama-stack/extension-basic-settings.js
+
+SETTINGS=extension-basic-settings.js
 
 VERSION=$(node -p -e "require('./package.json').version")
 

@@ -120,6 +120,17 @@ export function isCancelRequest(input: string): boolean {
         input.toUpperCase().localeCompare('EXIT', undefined, { sensitivity: 'base' }) == 0;
 }
 
+export function getMappedHeaders(application: any, streaming: boolean): Record<string, string | null | undefined> {
+
+    const headers: Headers = getHeaders(application, true);
+
+    var mappedHeaders: Record<string, string | null | undefined> = {}
+    for (const [key, value] of headers.entries()) {
+        mappedHeaders[key] = value;
+    }
+    return mappedHeaders;
+}
+
 export function getHeaders(application: any, streaming: boolean): Headers {
 
     //console.log(application);
