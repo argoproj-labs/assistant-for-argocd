@@ -1,5 +1,5 @@
 import { marked, Renderer } from "marked";
-import { AssistantSettings, Attachment, QueryContext } from "src/model/provider";
+import { AssistantSettings, Attachment, AttachmentType, QueryContext } from "../model/provider";
 
 export const HttpHeader = {
     CONTENT_TYPE: 'Content-Type',
@@ -118,6 +118,14 @@ export function isCancelRequest(input: string): boolean {
     return input.toUpperCase().localeCompare('CANCEL', undefined, { sensitivity: 'base' }) == 0 ||
         input.toUpperCase().localeCompare('QUIT', undefined, { sensitivity: 'base' }) == 0 ||
         input.toUpperCase().localeCompare('EXIT', undefined, { sensitivity: 'base' }) == 0;
+}
+
+export function getFilename(attachment: Attachment): string {
+    switch (attachment.type) {
+        case AttachmentType.LOG: return "logs.json"
+        case AttachmentType.EVENTS: return "events.json"
+        case AttachmentType.MANIFEST: return "manifest.json"
+    }
 }
 
 export function getMappedHeaders(application: any, streaming: boolean): Record<string, string | null | undefined> {

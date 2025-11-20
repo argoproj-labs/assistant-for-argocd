@@ -1,11 +1,11 @@
 import { Params } from "react-chatbotify";
 import { QueryContext, QueryProvider, QueryResponse } from "../model/provider";
 import LlamaStackClient from "llama-stack-client";
-import { ResponseCreateParamsStreaming } from "llama-stack-client/resources/responses";
-
+import { ResponseCreateParamsStreaming, ResponseObjectStream } from "llama-stack-client/resources/responses";
 import { getModel } from "../util/llamastack";
 import { getMappedHeaders } from "../util/util";
 import { INSTRUCTIONS } from "./const";
+import { Stream } from "llama-stack-client/streaming";
 
 const URL: string = 'https://' + location.host + "/extensions/assistant"
 
@@ -38,29 +38,69 @@ export class LlamaStackV2Provider implements QueryProvider {
             }
         }
 
+        let input = prompt;
+        context.attachments.forEach( (attachment) => {
+            input += "\n\n[Attachment:" + attachment.mimeType +"]\n" + attachment.content;
+        });
+
         const responseParams: ResponseCreateParamsStreaming = {
             model: this._model,
             instructions: INSTRUCTIONS,
-            input: prompt,
-            stream: true
+            stream: true,
+            input: input
         };
 
-        const response = await this._client.responses.create(responseParams);
 
-        const textStream: ReadableStream<string> = response.toReadableStream().pipeThrough(new TextDecoderStream());
-        const reader = textStream.getReader();
+        /*
+         * This is the way to do it once the API actually works in llama-stack
+         */
+        // let content = [];
+
+        // content.push(
+        //     {
+        //         "type": "input_text",
+        //         "text": "Analyze the letter and provide a summary of the key points.",
+        //     }
+        // );
+        // content.push(
+        //     context.attachments.map((item: Attachment) => {
+        //         return {type: "input_file", file_data: item.content, filename: getFilename(item)}
+        // }));
+
+        // const responseParams: ResponseCreateParamsStreaming = {
+        //     // input: [{
+        //     //     role: "user",
+        //     // ]},
+        //     model: this._model,
+        //     instructions: INSTRUCTIONS,
+        //     stream: true,
+        //     input: [
+        //         {
+        //         "role": "user",
+        //         "content": content
+        //         }
+        //     ],
+        // };
+
+        responseParams.previous_response_id = context.conversationID;
+
+        const stream: Stream<ResponseObjectStream> = await this._client.responses.create(responseParams);
 
         let text = '';
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            console.log(value);
-            text += value;
-            await params.streamMessage(text);
+        let responseID = '';
+        for await (const chunk of stream) {
+            console.log(chunk);
+            if ("delta" in chunk) {
+                text += chunk.delta;
+                await params.streamMessage(text);
+            }
+            if ( ("type" in chunk) && (chunk.type === "response.completed") ) {
+                responseID = chunk.response.id;
+                console.log("ResponseID: %s", responseID);
+            }
         }
 
-        return {success:true, conversationID: ""}
+        return {success:true, conversationID: responseID};
+
     }
-
-
 }
