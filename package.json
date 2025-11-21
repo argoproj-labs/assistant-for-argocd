@@ -13,11 +13,12 @@
         "build-dev": "yarn clean && yarn ts-node node_modules/.bin/webpack",
         "package": "yarn build && tar -C dist -cvf dist/extension-$npm_package_name-$npm_package_version.tar resources",
         "package-dev": "yarn build-dev && tar -C dist -cvf dist/extension-$npm_package_name-$npm_package_version.tar resources",
-        "clean": "rm -rf dist"
+        "clean": "rm -rf dist",
+        "clean-all": "rm -rf dist && rm -rf node_modules"
     },
     "devDependencies": {
         "@types/react": "^16.8.5",
-        "argo-ui": "git+https://github.com/argoproj/argo-ui.git",
+        "argo-ui": "https://github.com/argoproj/argo-ui.git",
         "css-loader": "^6.7.3",
         "mini-css-extract-plugin": "^2.7.2",
         "node-sass": "^8.0.0",
@@ -29,12 +30,12 @@
         "sass-loader": "^13.2.0",
         "style-loader": "^3.3.1",
         "ts-loader": "9.4.2",
-        "ts-node": "^10.8.1"
+        "ts-node": "^10.9.2"
     },
     "dependencies": {
         "@rcb-plugins/markdown-renderer": "^0.3.1",
         "dompurify": "^3.2.6",
-        "llama-stack-client": "github:llamastack/llama-stack-client-typescript",
+        "llama-stack-client": "https://github.com/llamastack/llama-stack-client-typescript#v0.3.2",
         "marked": "^15.0.12",
         "react-chatbotify": "^2.3.2",
         "react-use": "^17.6.0",

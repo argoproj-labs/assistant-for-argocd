@@ -50,7 +50,6 @@ export class LlamaStackV2Provider implements QueryProvider {
             input: input
         };
 
-
         /*
          * This is the way to do it once the API actually works in llama-stack
          */
@@ -68,9 +67,6 @@ export class LlamaStackV2Provider implements QueryProvider {
         // }));
 
         // const responseParams: ResponseCreateParamsStreaming = {
-        //     // input: [{
-        //     //     role: "user",
-        //     // ]},
         //     model: this._model,
         //     instructions: INSTRUCTIONS,
         //     stream: true,
