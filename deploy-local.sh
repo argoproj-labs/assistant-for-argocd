@@ -1,16 +1,25 @@
 # Deploys by copying js file into pod to make it faster for round-trip development,
 # haven't figured out yet how to live code the extension outside the pod.
 
-# NAMESPACE=openshift-gitops
-# LABEL_NAME=openshift-gitops-server
+if [ -z "${NAMESPACE}" ]; then
+  echo "Error: NAMESPACE is not set!" >&2
+  exit 1
+else
+  echo "Value of NAMESPACE: $NAMESPACE"
+fi
+if [ -z "${LABEL_NAME}" ]; then
+  echo "Error: LABEL_NAME is not set, set this to the name of the 'app.kubernetes.io/name' label for the 'server' pod" >&2
+  exit 1
+else
+  echo "Value of NAMESPACE: $LABEL_NAME"
+fi
+if [ -z "${SETTINGS}" ]; then
+  echo "Warning: SETTINGS variable is not set, not copying any settings over" >&2
+  exit 1
+else
+  echo "Value of SETTINGS: $SETTINGS"
+fi
 
-NAMESPACE=demo-gitops
-LABEL_NAME=argocd-server
-
-# The Settings file to use, this is installed as a second extension
-# SETTINGS=examples/settings/llama-stack/extension-basic-settings.js
-
-SETTINGS=extension-basic-settings.js
 
 VERSION=$(node -p -e "require('./package.json').version")
 
@@ -30,7 +39,9 @@ echo "Copying to pod $POD"
 
 oc cp dist/resources/extensions-assistant/extension-assistant-bundle-${VERSION}.min.js $NAMESPACE/$POD:/tmp/extensions/resources/extension-assistant-bundle-${VERSION}.min.js
 
-oc exec -it -n ${NAMESPACE} ${POD} -c argocd-server -- bash -c "mkdir -p /tmp/extensions/assistant-settings"
+if [ -v SETTINGS ]; then
+    echo "Copying settings"
 
-oc cp ${SETTINGS} $NAMESPACE/$POD:/tmp/extensions/assistant-settings/extension-settings.js
-
+    oc exec -it -n ${NAMESPACE} ${POD} -c argocd-server -- bash -c "mkdir -p /tmp/extensions/assistant-settings"
+    oc cp ${SETTINGS} $NAMESPACE/$POD:/tmp/extensions/assistant-settings/extension-settings.js
+fi
