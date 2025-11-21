@@ -52,7 +52,9 @@ export class LlamaStackV2Provider implements QueryProvider {
 
         /*
          * This is the way to do it once the API actually works in llama-stack
+         * See: https://github.com/llamastack/llama-stack/issues/4206
          */
+
         // let content = [];
 
         // content.push(
