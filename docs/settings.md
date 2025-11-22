@@ -15,7 +15,8 @@ The settings can be defined using a template as follows:
 
 ```
 var argocdAssistantSettings = {
-    provider: "Llama-Stack-V2"
+    provider: "Llama-Stack-V2",
+    model: "gemini/models/gemini-2.5-pro"
 };
 
 (() => {
