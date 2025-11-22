@@ -11,7 +11,7 @@ if [ -z "${LABEL_NAME}" ]; then
   echo "Error: LABEL_NAME is not set, set this to the name of the 'app.kubernetes.io/name' label for the 'server' pod" >&2
   exit 1
 else
-  echo "Value of NAMESPACE: $LABEL_NAME"
+  echo "Value of LABEL_NAME: $LABEL_NAME"
 fi
 if [ -z "${SETTINGS}" ]; then
   echo "Warning: SETTINGS variable is not set, not copying any settings over" >&2
