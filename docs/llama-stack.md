@@ -1,3 +1,12 @@
+### Providers
+
+There are two llama-stack providers as follows:
+
+1. *LLama-Stack*. This is the original provider, it uses the Agent API which has been deprecated in
+llama-stack. This provider is not recommended but remains available if needed.
+2. *LLama-Stack-V2*. This is the newer provider, it uses the Open AI Responses API and should be more compatible
+with later llama-stack versions given this is the recommended API from llama-stack.
+
 ### Installation
 
 *Prerequistes*: You must have llama-stack installed and configured with at least one inference engine. An example of doing

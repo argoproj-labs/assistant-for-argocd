@@ -15,7 +15,7 @@ The settings can be defined using a template as follows:
 
 ```
 var argocdAssistantSettings = {
-    provider: "Llama-Stack"
+    provider: "Llama-Stack-V2"
 };
 
 (() => {
@@ -26,7 +26,7 @@ var argocdAssistantSettings = {
 })();
 ```
 
-If no settings are provided the Assistant will default to Llama-Stack as
+If no settings are provided the Assistant will default to Llama-Stack-V2 as
 the back-end provider.
 
 Other settings are supported including provider specific settings. These
@@ -35,7 +35,7 @@ are as follows:
 | Setting  | Required | Description |
 | ------------- | ------------- | ---------- |
 | provider  | Yes  | If you provide a Settings object you must specify the back-end [Provider](https://github.com/argoproj-labs/assistant-for-argocd/blob/main/src/providers/providerFactory.ts#L6) to use. |
-| model  | No  | This specifies the model you want to use. If not specified the Provider will attempt to use a reasonable default. |
+| model  | No  | This specifies the model you want to use. If not specified the Provider will use the first model returned by llama-stack. |
 | data   | No  | Provider specific configuration, see docs for the Provider you are using. |
 | maximumLogLines | No | The maximum number of lines from the log that a user is permitted to attach to the context. Note that this impacts any token quota in place, increase with care. |
 
