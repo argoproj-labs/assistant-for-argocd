@@ -12,7 +12,7 @@ export enum Provider {
 export function createProvider(provider: Provider): QueryProvider {
     switch(provider) {
         case Provider.LIGHTSPEED: return new LightspeedProvider();
-        case Provider.LLAMA_STACK_V2: return new LlamaStackV2Provider();
-        default: return new LlamaStackProvider();
+        case Provider.LLAMA_STACK: return new LlamaStackProvider();
+        default: return new LlamaStackV2Provider();
     }
 }
