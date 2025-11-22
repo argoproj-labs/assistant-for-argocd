@@ -9,6 +9,12 @@ import { Stream } from "llama-stack-client/streaming";
 
 const URL: string = 'https://' + location.host + "/extensions/assistant"
 
+interface ResponseErrorStreamChunk {
+    error: {
+        message: string
+    }
+}
+
 export class LlamaStackV2Provider implements QueryProvider {
 
     private _model: string = undefined;
@@ -95,6 +101,11 @@ export class LlamaStackV2Provider implements QueryProvider {
             if ( ("type" in chunk) && (chunk.type === "response.completed") ) {
                 responseID = chunk.response.id;
                 console.log("ResponseID: %s", responseID);
+            }
+            if ( ( "error" in chunk) ) {
+                const error: ResponseErrorStreamChunk = (chunk as unknown) as ResponseErrorStreamChunk;
+                console.error(error);
+                return {success: false, error:{status:500, message: error.error.message}};
             }
         }
 
