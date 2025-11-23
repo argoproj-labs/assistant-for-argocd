@@ -43,13 +43,30 @@ some of the dependencies using later but compatible versions. I'm hoping in the 
 more seamlessly.
 
 ```
-npm install --force
+yarn install --force
 ```
 
 To build the extension use `yarn run build`, see `package.json` for other available commands.
 
 I have not figured out a way to develop it with live code so I use the script `./deploy-local.sh` to build and copy the extension into
-a running Argo CD on the cluster. Tweak the NAMESPACE and LABEL_NAME environment variables to match your instance of Argo CD. Note
+a running Argo CD on the cluster.
+
+Before running the script you will need to export some environment variables to inform
+the script about the targeted Argo CD installation:
+
+```
+# Namespace where Argo CD is running
+export NAMESPACE=argocd
+
+# The label to use to look up the argocd-server pod, note
+# the script expects a single pod
+export LABEL_NAME=argocd-server
+
+# Optional, rhe settings file to copy over
+export SETTINGS=extension-basic-settings.js
+```
+
+Tweak the NAMESPACE and LABEL_NAME environment variables to match your instance of Argo CD. Note
 the LABEL_NAME needs to be a unique label on the Argo CD server component.
 
 # Packaging
