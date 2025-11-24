@@ -48,6 +48,10 @@ To create a settings extension, put your settings `.js` file in the following di
 resources/extensions-assistant-settings/<your-filename>.js
 ```
 
+**Note**: The settings extension must be installed in it's own directory, do not
+re-use the `extensions-assistant` directory of the assistant. This is because the Argo CD Extension installer will only work with one Javascript (.js) file per
+folder.
+
 You can then tar the file:
 
 ```
