@@ -6,8 +6,15 @@ import { getModel } from "../util/llamastack";
 import { getMappedHeaders } from "../util/util";
 import { INSTRUCTIONS } from "./const";
 import { Stream } from "llama-stack-client/streaming";
+import { FeatureFlags, isFeatureEnabled } from "../featureFlags";
 
-const URL: string = 'https://' + location.host + "/extensions/assistant"
+const BASE_ARGO_CD_URL = 'https://' + location.host;
+const URL: string = BASE_ARGO_CD_URL + "/extensions/assistant"
+
+// Same as in index.ts, I don't want the provider to reference root code so just
+// re-implemented here. Once this feature moves out of experimental I'll look
+// at putting this in a common spot.
+const ARGOCD_MCP_TOKEN = "argocd-mcp-token";
 
 interface ResponseErrorStreamChunk {
     error: {
@@ -53,8 +60,26 @@ export class LlamaStackV2Provider implements QueryProvider {
             model: this._model,
             instructions: INSTRUCTIONS,
             stream: true,
-            input: input
+            input: input,
+            tools: []
         };
+
+        if (isFeatureEnabled(FeatureFlags.ArgoCDMCP) && (ARGOCD_MCP_TOKEN in sessionStorage)) {
+            responseParams.tools.push(
+                {
+                    type: "mcp",
+                    server_label: "Argo CD MCP",
+                    server_url: context.settings.data?.argocdMCPUrl,
+                    require_approval: "never",
+                    headers: {
+                        "x-argocd-api-token": sessionStorage.getItem(ARGOCD_MCP_TOKEN),
+                        "x-argocd-base-url": BASE_ARGO_CD_URL
+                    }
+                }
+            );
+        }
+
+        responseParams.previous_response_id = context.conversationID;
 
         /*
          * This is the way to do it once the API actually works in llama-stack
@@ -85,8 +110,6 @@ export class LlamaStackV2Provider implements QueryProvider {
         //         }
         //     ],
         // };
-
-        responseParams.previous_response_id = context.conversationID;
 
         const stream: Stream<ResponseObjectStream> = await this._client.responses.create(responseParams);
 

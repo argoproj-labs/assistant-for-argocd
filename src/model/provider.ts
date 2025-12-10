@@ -83,9 +83,10 @@ export interface QueryContext {
 
     /**
      * Can be used by the provider to maintain any arbitrary data between
-     * queries that needs to be preserved on a reset.
+     * queries that needs to be preserved on a reset. Since this is specified
+     * as a string since it needs to be serialized.
      */
-    get data(): any;
+    get data(): string;
 
     /**
      * Available attachments (aka Documents) that can be used to provide
@@ -99,6 +100,7 @@ export interface QueryContext {
      * Any settings that were defined.
      */
     get settings(): AssistantSettings;
+
 }
 
 export type QueryError = {

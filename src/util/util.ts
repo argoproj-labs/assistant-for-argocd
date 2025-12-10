@@ -112,6 +112,11 @@ export function isAttachRequest(input: string): boolean {
     return input.toUpperCase().localeCompare('ATTACH', undefined, { sensitivity: 'base' }) == 0;
 }
 
+export function isTokenRequest(input: string): boolean {
+    if (input === undefined || input === "") return false;
+    return input.toUpperCase().localeCompare('TOKEN', undefined, { sensitivity: 'base' }) == 0;
+}
+
 export function isCancelRequest(input: string): boolean {
     if (input === undefined || input === "") return false;
 

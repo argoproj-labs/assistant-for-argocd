@@ -33,15 +33,16 @@ oc exec -it -n ${NAMESPACE} ${POD} -c argocd-server -- bash -c "rm -rf /tmp/exte
 
 echo "Make sure directory exists"
 
-oc exec -it -n ${NAMESPACE} ${POD} -c argocd-server -- bash -c "mkdir -p /tmp/extensions/resources"
+oc exec -it -n ${NAMESPACE} ${POD} -c argocd-server -- bash -c "mkdir -p /tmp/extensions/resources/extensions-assistant"
 
 echo "Copying to pod $POD"
 
-oc cp dist/resources/extensions-assistant/extension-assistant-bundle-${VERSION}.min.js $NAMESPACE/$POD:/tmp/extensions/resources/extension-assistant-bundle-${VERSION}.min.js
+oc cp dist/resources/extensions-assistant/extension-assistant-bundle-${VERSION}.min.js $NAMESPACE/$POD:/tmp/extensions/resources/extensions-assistant/extension-assistant-bundle-${VERSION}.min.js
 
 if [ -v SETTINGS ]; then
     echo "Copying settings"
 
-    oc exec -it -n ${NAMESPACE} ${POD} -c argocd-server -- bash -c "mkdir -p /tmp/extensions/assistant-settings"
-    oc cp ${SETTINGS} $NAMESPACE/$POD:/tmp/extensions/assistant-settings/extension-settings.js
+    oc exec -it -n ${NAMESPACE} ${POD} -c argocd-server -- bash -c "rm -rf /tmp/extensions/resources/assistant-settings"
+    oc exec -it -n ${NAMESPACE} ${POD} -c argocd-server -- bash -c "mkdir -p /tmp/extensions/resources/assistant-settings"
+    oc cp ${SETTINGS} $NAMESPACE/$POD:/tmp/extensions/resources/assistant-settings/extension-settings.js
 fi
