@@ -23,6 +23,7 @@ markdown_extensions:
       format: !!python/name:pymdownx.superfences.fence_code_format
 nav:
   - Overview: index.md
+  - Architecture: architecture.md
   - Providers:
     - Llama-Stack:
       - Use Llama-Stack: providers/llama-stack/llama-stack.md

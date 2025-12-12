@@ -19,22 +19,9 @@ An interactive video demo is available:
 
 https://interact.redhat.com/share/xWi5je6tPnJe4dcspahl
 
-# Providers
+# Documentation
 
-The extension has been designed to support pluggable query providers with Llama-Stack and OpenShift Lightspeed
-as the supported back-end providers. Contributions welcome for additional providers!
-
-# Configuration
-
-See the documentation on [Settings](https://github.com/argoproj-labs/assistant-for-argocd/blob/main/docs/settings.md)
-
-# Installing Extension in Argo CD
-
-To install the Extension see the Provider specific documentation:
-
-* [Llama-Stack](https://github.com/argoproj-labs/assistant-for-argocd/blob/main/docs/llama-stack.md)
-* [Lightspeed](https://github.com/argoproj-labs/assistant-for-argocd/blob/main/docs/lightspeed.md)
-
+Documentation for the Assistant for Argo CD is available [here](https://assistant-for-argocd.readthedocs.io/en/latest/).
 
 # Development
 
