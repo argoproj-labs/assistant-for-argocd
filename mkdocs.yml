@@ -26,8 +26,8 @@ nav:
   - Architecture: architecture.md
   - Providers:
     - Llama-Stack:
-      - Use Llama-Stack: providers/llama-stack/llama-stack.md
+      - Configure: providers/llama-stack/llama-stack.md
     - Lightspeed:
-      - Install Lightspeed: providers/lightspeed/lightspeed-install-configure.md
-      - Use Lightspeed: providers/lightspeed/lightspeed.md
+      - Install: providers/lightspeed/lightspeed-install-configure.md
+      - Configure: providers/lightspeed/lightspeed.md
   - Settings: settings.md
