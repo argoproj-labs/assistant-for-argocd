@@ -49,6 +49,16 @@ export class LlamaStackV2Provider implements QueryProvider {
                 }
                 console.log("Using model: " + this._model);
             }
+
+            if (isFeatureEnabled(FeatureFlags.ArgoCDMCP)) {
+                this._client.toolgroups.register({
+                    provider_id: "model-context-protocol",
+                    toolgroup_id: "mcp::argocd",
+                    mcp_endpoint: {
+                        uri: context.settings.data?.argocdMCPUrl
+                    }
+                });
+            }
         }
 
         let input = prompt;
