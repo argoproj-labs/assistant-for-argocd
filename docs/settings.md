@@ -5,9 +5,10 @@ mechanism doesn't provide a way to pass configuration to the extension. To work 
 we deploy the settings as a second Argo CD Extension that makes the settings available
 as a global variable.
 
-*IMPORTANT*: Never put any API keys or other secret material in these settings as they
-can be easily read from the browser by viewing source. Any API keys required should
-be set on the backend, Llama-Stack or Lightspeed for example.
+!!! important "API Keys"
+    Never put any API keys or other secret material in these settings as they
+    can be easily read from the browser by viewing source. Any API keys required should
+    be set on the backend, Llama-Stack or Lightspeed, for example.
 
 ### Defining Settings
 

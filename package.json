@@ -14,7 +14,9 @@
         "package": "yarn build && tar -C dist -cvf dist/extension-$npm_package_name-$npm_package_version.tar resources",
         "package-dev": "yarn build-dev && tar -C dist -cvf dist/extension-$npm_package_name-$npm_package_version.tar resources",
         "clean": "rm -rf dist",
-        "clean-all": "rm -rf dist && rm -rf node_modules"
+        "clean-all": "rm -rf dist && rm -rf node_modules",
+        "build-docs": "podman run  --rm -v .:/docs docker.io/squidfunk/mkdocs-material:9 build",
+        "clean-docs": "rm -rf site"
     },
     "devDependencies": {
         "@types/react": "^16.8.5",
