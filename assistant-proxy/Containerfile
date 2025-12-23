@@ -1,0 +1,10 @@
+FROM docker.io/library/golang:1.24 AS builder
+WORKDIR /src
+COPY . .
+RUN make clean && make package
+
+FROM docker.io/library/alpine:latest
+
+COPY --from=builder /src/build/bin/assistant-proxy /bin/assistant-proxy
+USER 999
+ENTRYPOINT ["/bin/assistant-proxy"]

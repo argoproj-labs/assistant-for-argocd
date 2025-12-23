@@ -9,7 +9,7 @@ import { Stream } from "llama-stack-client/streaming";
 import { FeatureFlags, isFeatureEnabled } from "../featureFlags";
 
 const BASE_ARGO_CD_URL = 'https://' + location.host;
-const URL: string = BASE_ARGO_CD_URL + "/extensions/assistant"
+const URL: string = BASE_ARGO_CD_URL + "/assistant"
 
 // Same as in index.ts, I don't want the provider to reference root code so just
 // re-implemented here. Once this feature moves out of experimental I'll look
