@@ -19,17 +19,26 @@ spec:
           env:
             - name: LLAMA_STACK_URL
               value: http://llamastack.llamastack.svc.cluster.local:8321
+            - name: ARGO_CD_URL
+              value: https://argocd-server.demo-gitops.svc.cluster.local:443
           ports:
             - containerPort: 8321
               protocol: TCP
           imagePullPolicy: Always
           terminationMessagePolicy: File
           image: 'quay.io/gnunn/assistant-proxy:latest'
+          volumeMounts:
+            - name: openshift-service-ca
+              mountPath: /etc/ssl/certs
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       dnsPolicy: ClusterFirst
       securityContext: {}
       schedulerName: default-scheduler
+      volumes:
+        - name: openshift-service-ca
+          configMap:
+            name: openshift-service-ca.crt
   strategy:
     type: RollingUpdate
     rollingUpdate:

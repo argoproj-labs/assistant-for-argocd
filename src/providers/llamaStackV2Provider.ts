@@ -14,7 +14,7 @@ const URL: string = BASE_ARGO_CD_URL + "/assistant"
 // Same as in index.ts, I don't want the provider to reference root code so just
 // re-implemented here. Once this feature moves out of experimental I'll look
 // at putting this in a common spot.
-const ARGOCD_MCP_TOKEN = "argocd-mcp-token";
+//const ARGOCD_MCP_TOKEN = "argocd-mcp-token";
 
 interface ResponseErrorStreamChunk {
     error: {
@@ -74,7 +74,7 @@ export class LlamaStackV2Provider implements QueryProvider {
             tools: []
         };
 
-        if (isFeatureEnabled(FeatureFlags.ArgoCDMCP) && (ARGOCD_MCP_TOKEN in sessionStorage)) {
+        if (isFeatureEnabled(FeatureFlags.ArgoCDMCP)) {
             responseParams.tools.push(
                 {
                     type: "mcp",
@@ -82,7 +82,7 @@ export class LlamaStackV2Provider implements QueryProvider {
                     server_url: context.settings.data?.argocdMCPUrl,
                     require_approval: "never",
                     headers: {
-                        "x-argocd-api-token": sessionStorage.getItem(ARGOCD_MCP_TOKEN),
+                        "x-argocd-api-token": "{{argocd.token}}",
                         "x-argocd-base-url": BASE_ARGO_CD_URL
                     }
                 }

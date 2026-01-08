@@ -14,7 +14,7 @@ export type FeatureFlagName = typeof FeatureFlags[keyof typeof FeatureFlags];
  * Enable the feature flags here
  */
 const userFeatureFlags: Record<FeatureFlagName, boolean> = {
-  [FeatureFlags.ArgoCDMCP]: false
+  [FeatureFlags.ArgoCDMCP]: true
 };
 
 /**
