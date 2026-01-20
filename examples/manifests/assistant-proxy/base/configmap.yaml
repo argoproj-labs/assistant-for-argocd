@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: assistant-proxy
+data:
+  LLAMA_STACK_URL: http://llamastack.llamastack.svc.cluster.local:8321
+  ARGO_CD_URL: https://argocd-server.demo-gitops.svc.cluster.local:443
+  LOGGING_LEVEL: INFO

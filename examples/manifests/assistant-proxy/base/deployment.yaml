@@ -16,11 +16,9 @@ spec:
         - resources: {}
           terminationMessagePath: /dev/termination-log
           name: assistant-proxy
-          env:
-            - name: LLAMA_STACK_URL
-              value: http://llamastack.llamastack.svc.cluster.local:8321
-            - name: ARGO_CD_URL
-              value: https://argocd-server.demo-gitops.svc.cluster.local:443
+          envFrom:
+          - configMapRef:
+              name: assistant-proxy
           ports:
             - containerPort: 8321
               protocol: TCP
