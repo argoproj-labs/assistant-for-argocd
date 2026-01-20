@@ -1,5 +1,6 @@
 # Binaries
 proxy
+build/bin/*
 
 # Go build artifacts
 *.exe
@@ -13,6 +14,7 @@ proxy
 
 # Output of the go coverage tool
 *.out
+
 
 
 

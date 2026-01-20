@@ -3,4 +3,3 @@ node_modules
 .ignore
 run-local.sh
 site
-assistant-proxy/build/bin
