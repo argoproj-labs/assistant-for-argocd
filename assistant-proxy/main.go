@@ -19,6 +19,20 @@ import (
 	"github.com/patrickmn/go-cache"
 )
 
+const validateTokenAPIURI = "/api/v1/session/userinfo"
+
+// Environment variables
+const (
+	LLAMA_STACK_URL      = "LLAMA_STACK_URL"
+	ARGO_CD_URL          = "ARGO_CD_URL"
+	LOGGING_LEVEL        = "LOGGING_LEVEL"
+	PROXY_PORT           = "PROXY_PORT"
+	ENABLE_TLS           = "ENABLE_TLS"
+	TLS_CERT_FILE        = "TLS_CERT_FILE"
+	TLS_KEY_FILE         = "TLS_KEY_FILE"
+	INSECURE_SKIP_VERIFY = "INSECURE_SKIP_VERIFY"
+)
+
 func getEnv(key, defaultValue string) string {
 	if value := os.Getenv(key); value != "" {
 		return value
@@ -115,8 +129,8 @@ func (rw *responseWriter) captureHeaders() {
 
 // loadConfig loads configuration from environment variables
 func loadConfig() (*Config, error) {
-	llamaStackURL := getEnv("LLAMA_STACK_URL", "http://localhost:8321")
-	loggingLevelStr := getEnv("LOGGING_LEVEL", "INFO")
+	llamaStackURL := getEnv(LLAMA_STACK_URL, "http://localhost:8321")
+	loggingLevelStr := getEnv(LOGGING_LEVEL, "INFO")
 	logLevel := parseLogLevel(loggingLevelStr)
 
 	// Parse the target URL
@@ -127,14 +141,14 @@ func loadConfig() (*Config, error) {
 
 	config := &Config{
 		LlamaStackURL:      llamaStackURL,
-		ProxyPort:          getEnvInt("PROXY_PORT", 8080),
-		EnableTLS:          getEnvBool("ENABLE_TLS", false),
-		TLSCertFile:        getEnv("TLS_CERT_FILE", ""),
-		TLSKeyFile:         getEnv("TLS_KEY_FILE", ""),
+		ProxyPort:          getEnvInt(PROXY_PORT, 8080),
+		EnableTLS:          getEnvBool(ENABLE_TLS, false),
+		TLSCertFile:        getEnv(TLS_CERT_FILE, ""),
+		TLSKeyFile:         getEnv(TLS_KEY_FILE, ""),
 		LoggingLevelStr:    loggingLevelStr,
 		LogLevel:           logLevel,
-		ArgoCDURL:          getEnv("ARGO_CD_URL", ""),
-		InsecureSkipVerify: getEnvBool("INSECURE_SKIP_VERIFY", false),
+		ArgoCDURL:          getEnv(ARGO_CD_URL, ""),
+		InsecureSkipVerify: getEnvBool(INSECURE_SKIP_VERIFY, false),
 		TargetURL:          target,
 		TokenCache:         cache.New(cache.NoExpiration, cache.NoExpiration), // Will set expiration per item
 	}
@@ -392,7 +406,7 @@ func validateTokenWithArgoCD(config *Config, tokenString string) (bool, error) {
 
 	// Build the userinfo endpoint URL
 	baseURL := strings.TrimSuffix(config.ArgoCDURL, "/")
-	userInfoURL := fmt.Sprintf("%s/api/v1/session/userinfo", baseURL)
+	userInfoURL := fmt.Sprintf("%s%s", baseURL, validateTokenAPIURI)
 
 	// Create HTTP client
 	client := &http.Client{
