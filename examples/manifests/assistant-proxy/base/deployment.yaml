@@ -24,10 +24,13 @@ spec:
               protocol: TCP
           imagePullPolicy: Always
           terminationMessagePolicy: File
-          image: 'quay.io/gnunn/assistant-proxy:latest'
+          image: 'quay.io/gnunn/assistant-proxy:test'
           volumeMounts:
             - name: openshift-service-ca
               mountPath: /etc/ssl/certs
+            - name: assistant-proxy-tools
+              mountPath: /app/config
+              readOnly: true
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       dnsPolicy: ClusterFirst
@@ -37,6 +40,9 @@ spec:
         - name: openshift-service-ca
           configMap:
             name: openshift-service-ca.crt
+        - name: assistant-proxy-tools
+          secret:
+            secretName: assistant-proxy-tools
   strategy:
     type: RollingUpdate
     rollingUpdate:

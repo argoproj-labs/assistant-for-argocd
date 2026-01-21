@@ -19,7 +19,11 @@ import (
 	"github.com/patrickmn/go-cache"
 )
 
+// API used to validate Argo CD token
 const validateTokenAPIURI = "/api/v1/session/userinfo"
+
+// Path to the tools configuration file
+const toolsConfigPath = "/app/config/tools.json"
 
 // Environment variables
 const (
@@ -161,7 +165,8 @@ func setupLogger(config *Config) {
 	opts := &slog.HandlerOptions{
 		Level: config.LogLevel,
 	}
-	handler := slog.NewTextHandler(os.Stdout, opts)
+	//handler := slog.NewTextHandler(os.Stdout, opts)
+	handler := slog.NewJSONHandler(os.Stdout, opts)
 	logger := slog.New(handler)
 	slog.SetDefault(logger)
 }
@@ -257,7 +262,7 @@ func createRequestHandler(config *Config, proxy *httputil.ReverseProxy) func(htt
 			r.URL.Path = "/"
 		}
 
-		// Replace {{argocd.token}} in request body for specific endpoint
+		// Rewrite request body for /v1/openai/v1/responses: replace {{argocd.token}} and set .tools
 		if r.URL.Path == "/v1/openai/v1/responses" && r.Body != nil {
 			bodyBytes, err := io.ReadAll(r.Body)
 			if err != nil {
@@ -267,15 +272,37 @@ func createRequestHandler(config *Config, proxy *httputil.ReverseProxy) func(htt
 			}
 			r.Body.Close()
 
-			// Replace {{argocd.token}} with actual token value
 			bodyStr := string(bodyBytes)
-			bodyStr = strings.ReplaceAll(bodyStr, "{{argocd.token}}", token)
 
+			// Insert or replace .tools from /app/config/tools.json, or [] if file missing.
+			// {{argocd.token}} in the tools file is replaced with the actual token.
+			tools, loadErr := loadToolsFromFile(toolsConfigPath, token, r.Host)
+			if loadErr != nil {
+				slog.Warn("Failed to load tools from file, using empty array", "path", toolsConfigPath, "error", loadErr)
+				tools = []interface{}{}
+			}
+
+			var payload map[string]interface{}
+			if err := json.Unmarshal([]byte(bodyStr), &payload); err != nil {
+				slog.Warn("Request body is not valid JSON, skipping tools injection", "path", r.URL.Path, "error", err)
+			} else {
+				if payload == nil {
+					payload = make(map[string]interface{})
+				}
+				payload["tools"] = tools
+				bs, marshalErr := json.Marshal(payload)
+				if marshalErr != nil {
+					slog.Warn("Failed to marshal modified request body", "error", marshalErr)
+					http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+					return
+				}
+				bodyStr = string(bs)
+			}
 			// Update request body with modified content
 			r.Body = io.NopCloser(bytes.NewBufferString(bodyStr))
 			r.ContentLength = int64(len(bodyStr))
 
-			slog.Debug("Replaced {{argocd.token}} in request body", "path", r.URL.Path)
+			slog.Debug("Rewrote request body: tools ({{argocd.token}} replaced in tools)", "path", r.URL.Path)
 		}
 
 		// Log request with headers at debug level
@@ -300,6 +327,16 @@ func createRequestHandler(config *Config, proxy *httputil.ReverseProxy) func(htt
 				"remote_addr", r.RemoteAddr,
 				"headers", headers,
 				"body", string(requestBody))
+
+			fmt.Println("****** Request Body *******")
+			prettyJSON, err := json.MarshalIndent(string(requestBody), "", "  ")
+			if err != nil {
+				slog.Error("Failed to marshal indent request body", "error", err)
+			}
+
+			// Print the result as a string
+			fmt.Println(string(prettyJSON))
+			fmt.Println("****** End Request Body *******")
 		}
 
 		// Wrap response writer to capture response
@@ -318,6 +355,31 @@ func createRequestHandler(config *Config, proxy *httputil.ReverseProxy) func(htt
 
 		proxy.ServeHTTP(responseWriter, r)
 	}
+}
+
+// loadToolsFromFile reads the tools array from the mounted config file.
+// {{argocd.token}} in the file content is replaced with the provided token before parsing.
+// If the file does not exist, returns an empty slice. If the file exists but is invalid JSON, returns an error.
+func loadToolsFromFile(path string, argocdToken string, argocdHost string) ([]interface{}, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return []interface{}{}, nil
+		}
+		return nil, err
+	}
+	// Replace {{argocd.token}} only in the tools stanza (the loaded file)
+	data = []byte(strings.ReplaceAll(string(data), "{{argocd.token}}", argocdToken))
+	data = []byte(strings.ReplaceAll(string(data), "{{argocd.host}}", argocdHost))
+
+	var tools []interface{}
+	if err := json.Unmarshal(data, &tools); err != nil {
+		return nil, err
+	}
+	if tools == nil {
+		tools = []interface{}{}
+	}
+	return tools, nil
 }
 
 // getTokenFromCookie extracts the JWT token from the argocd.token cookie

@@ -6,7 +6,7 @@ import { getModel } from "../util/llamastack";
 import { getMappedHeaders } from "../util/util";
 import { INSTRUCTIONS } from "./const";
 import { Stream } from "llama-stack-client/streaming";
-import { FeatureFlags, isFeatureEnabled } from "../featureFlags";
+//import { FeatureFlags, isFeatureEnabled } from "../featureFlags";
 
 const BASE_ARGO_CD_URL = 'https://' + location.host;
 const URL: string = BASE_ARGO_CD_URL + "/assistant"
@@ -50,15 +50,15 @@ export class LlamaStackV2Provider implements QueryProvider {
                 console.log("Using model: " + this._model);
             }
 
-            if (isFeatureEnabled(FeatureFlags.ArgoCDMCP)) {
-                this._client.toolgroups.register({
-                    provider_id: "model-context-protocol",
-                    toolgroup_id: "mcp::argocd",
-                    mcp_endpoint: {
-                        uri: context.settings.data?.argocdMCPUrl
-                    }
-                });
-            }
+            // if (isFeatureEnabled(FeatureFlags.ArgoCDMCP)) {
+            //     this._client.toolgroups.register({
+            //         provider_id: "model-context-protocol",
+            //         toolgroup_id: "mcp::argocd",
+            //         mcp_endpoint: {
+            //             uri: context.settings.data?.argocdMCPUrl
+            //         }
+            //     });
+            // }
         }
 
         let input = prompt;
@@ -74,20 +74,20 @@ export class LlamaStackV2Provider implements QueryProvider {
             tools: []
         };
 
-        if (isFeatureEnabled(FeatureFlags.ArgoCDMCP)) {
-            responseParams.tools.push(
-                {
-                    type: "mcp",
-                    server_label: "Argo CD MCP",
-                    server_url: context.settings.data?.argocdMCPUrl,
-                    require_approval: "never",
-                    headers: {
-                        "x-argocd-api-token": "{{argocd.token}}",
-                        "x-argocd-base-url": BASE_ARGO_CD_URL
-                    }
-                }
-            );
-        }
+        // if (isFeatureEnabled(FeatureFlags.ArgoCDMCP)) {
+        //     responseParams.tools.push(
+        //         {
+        //             type: "mcp",
+        //             server_label: "Argo CD MCP",
+        //             server_url: context.settings.data?.argocdMCPUrl,
+        //             require_approval: "never",
+        //             headers: {
+        //                 "x-argocd-api-token": "{{argocd.token}}",
+        //                 "x-argocd-base-url": BASE_ARGO_CD_URL
+        //             }
+        //         }
+        //     );
+        // }
 
         responseParams.previous_response_id = context.conversationID;
 

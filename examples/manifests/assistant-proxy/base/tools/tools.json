@@ -1,0 +1,12 @@
+[
+  {
+    "type": "mcp",
+    "server_label": "Argo CD MCP",
+    "server_url": "http://argocd-mcp.mcp-for-argocd.svc.cluster.local:3000/mcp",
+    "require_approval": "never",
+    "headers": {
+      "x-argocd-base-url": "https://{{argocd.host}}",
+      "x-argocd-api-token": "{{argocd.token}}"
+    }
+  }
+]

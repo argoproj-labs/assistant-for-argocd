@@ -6,3 +6,10 @@ resources:
   - deployment.yaml
   - service.yaml
   - route.yaml
+
+secretGenerator:
+  - name: assistant-proxy-tools
+    files:
+      - tools.json=tools/tools.json
+    options:
+      disableNameSuffixHash: true

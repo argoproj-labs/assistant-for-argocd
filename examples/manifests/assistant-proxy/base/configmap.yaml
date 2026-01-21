@@ -4,5 +4,6 @@ metadata:
   name: assistant-proxy
 data:
   LLAMA_STACK_URL: http://llamastack.llamastack.svc.cluster.local:8321
-  ARGO_CD_URL: https://argocd-server.demo-gitops.svc.cluster.local:443
-  LOGGING_LEVEL: INFO
+  ARGO_CD_URL: https://argocd-server-demo-gitops.apps.home.ocplab.com
+  LOGGING_LEVEL: DEBUG
+  INSECURE_SKIP_VERIFY: "true"
