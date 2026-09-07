@@ -2,7 +2,7 @@ import { Params } from "react-chatbotify";
 import { QueryContext, QueryProvider, QueryResponse } from "../model/provider";
 import LlamaStackClient from "llama-stack-client";
 import { ResponseCreateParamsStreaming, ResponseObjectStream } from "llama-stack-client/resources/responses";
-import { getModel } from "../util/llamastack";
+import { getModel, UNAVAILABLE_MODEL } from "../util/llamastack";
 import { getMappedHeaders } from "../util/util";
 import { INSTRUCTIONS } from "./const";
 import { Stream } from "llama-stack-client/streaming";
@@ -42,9 +42,14 @@ export class LlamaStackV2Provider implements QueryProvider {
                 defaultHeaders: getMappedHeaders(context.application, true)
             });
 
-            if (this._model == undefined) {
+            // Retry model discovery if it's unresolved, or if the last attempt
+            // found no available models - a real model may have shown up
+            // since (e.g. registry refresh, config fix), and we don't want a
+            // stale "unavailable" wedged in this provider instance for the
+            // rest of the browser session.
+            if (this._model == undefined || this._model === UNAVAILABLE_MODEL) {
                 this._model = await getModel(this._client, context);
-                if (this._model == undefined) {
+                if (this._model == undefined || this._model === UNAVAILABLE_MODEL) {
                     return {success: false, error:{status:404, message:"No models are configured or available in LLamaStack"}};
                 }
                 console.log("Using model: " + this._model);
@@ -121,7 +126,21 @@ export class LlamaStackV2Provider implements QueryProvider {
         //     ],
         // };
 
-        const stream: Stream<ResponseObjectStream> = await this._client.responses.create(responseParams);
+        // this._client.responses.create() is hardcoded to POST /v1/openai/v1/responses
+        // (llama-stack-client v0.3.2, resources/responses/responses.ts), mirroring
+        // upstream llama-stack's OpenAI-compat namespace. The ogx-server backend only
+        // ever mounts the Responses API natively at /v1/responses (see
+        // ogx-ai/ogx: src/ogx_api/responses/fastapi_routes.py, router prefix "v1" +
+        // "/responses", no /openai/v1 nesting) so the SDK method 404s. Bypass the
+        // resource wrapper and hit the correct path directly via the same underlying
+        // APIClient.post() the generated method itself uses.
+        const stream: Stream<ResponseObjectStream> = await this._client.post<
+            ResponseCreateParamsStreaming,
+            Stream<ResponseObjectStream>
+        >("/v1/responses", {
+            body: responseParams,
+            stream: true,
+        });
 
         let text = '';
         let responseID = '';

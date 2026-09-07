@@ -1,6 +1,12 @@
 import LlamaStackClient from "llama-stack-client";
 import { QueryContext } from "../model/provider";
 
+// Sentinel returned by getModel() when no models were available at lookup
+// time. Callers must treat this as "unresolved", not a cacheable value -
+// caching it as if it were a real model wedges every future conversation
+// until the provider instance is recreated (e.g. a full page reload).
+export const UNAVAILABLE_MODEL = "unavailable";
+
 /**
  * Fetches the model to use, right now defaults based on first
  * available model that llama-stack returns but this needs to be
@@ -14,14 +20,21 @@ export async function getModel(client: LlamaStackClient, context: QueryContext):
         // const providers = await client.providers.list();
         // console.log(providers);
 
-        // Simple implementation to use first available model if one wasn't configured
+        // ogx-server's GET /v1/models always returns the OpenAI-compatible shape
+        // (id, custom_metadata.model_type) unless Anthropic/Google SDK detection
+        // headers are present - there is no way to get the older native llama-stack
+        // shape (identifier, model_type top-level) from this endpoint. Read both so
+        // this works whether the backend returns the native or OpenAI-compat shape.
         const availableModels = (await client.models.list())
-            .filter((model: any) =>
-                model.model_type === 'llm' &&
-                !model.identifier.includes('guard') &&
-                !model.identifier.includes('405')
-            )
-            .map((model: any) => model.identifier);
+            .filter((model: any) => {
+                const modelType = model.model_type ?? model.custom_metadata?.model_type;
+                const identifier = model.identifier ?? model.id;
+                return modelType === 'llm' &&
+                    identifier != undefined &&
+                    !identifier.includes('guard') &&
+                    !identifier.includes('405');
+            })
+            .map((model: any) => model.identifier ?? model.id);
 
         console.log("Available Models from Llama-Stack");
         console.log(availableModels);
@@ -36,7 +49,7 @@ export async function getModel(client: LlamaStackClient, context: QueryContext):
             return context.settings.model;
         } else if (availableModels.length === 0) {
             console.warn('No available models in llama-stack available for use.');
-            return "unavailable";
+            return UNAVAILABLE_MODEL;
         } else {
             return availableModels[0];
         }

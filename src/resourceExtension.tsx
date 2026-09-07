@@ -22,7 +22,11 @@ export const ResourceAssistantExtension = (props: any) => {
     console.log("Properties passed to Extension");
     console.log(props);
 
-    const [settings] = React.useState<AssistantSettings>(globalThis.argocdAssistantSettings != undefined ? globalThis.argocdAssistantSettings: {provider: Provider.LLAMA_STACK});
+    // Default to Llama-Stack-V2 (Responses API) when no settings extension is
+    // installed, matching docs/settings.md. Llama-Stack (Agents API) is
+    // deprecated upstream and unsupported by ogx-server and other newer
+    // llama-stack-compatible backends.
+    const [settings] = React.useState<AssistantSettings>(globalThis.argocdAssistantSettings != undefined ? globalThis.argocdAssistantSettings: {provider: Provider.LLAMA_STACK_V2});
 
     // Form used for guided conversation flow to load logs
     const [provider] = React.useState<QueryProvider>(createProvider(settings.provider as Provider));

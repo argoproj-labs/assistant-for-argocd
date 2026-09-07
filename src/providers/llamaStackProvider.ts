@@ -5,7 +5,7 @@ import { Attachment, QueryContext, QueryProvider, QueryResponse } from "../model
 import { AgentConfig } from "llama-stack-client/resources/shared";
 import LlamaStackClient from 'llama-stack-client';
 import { TurnCreateParams, TurnResponseEventPayload } from "llama-stack-client/resources/agents/turn";
-import { getModel } from "../util/llamastack";
+import { getModel, UNAVAILABLE_MODEL } from "../util/llamastack";
 import { getMappedHeaders } from "../util/util";
 import { INSTRUCTIONS } from "./const";
 
@@ -41,9 +41,14 @@ export class LlamaStackProvider implements QueryProvider {
                 defaultHeaders: getMappedHeaders(context.application, true)
             });
 
-            if (this._model == undefined) {
+            // Retry model discovery if it's unresolved, or if the last attempt
+            // found no available models - a real model may have shown up
+            // since (e.g. registry refresh, config fix), and we don't want a
+            // stale "unavailable" wedged in this provider instance for the
+            // rest of the browser session.
+            if (this._model == undefined || this._model === UNAVAILABLE_MODEL) {
                 this._model = await getModel(this._client, context);
-                if (this._model == undefined) {
+                if (this._model == undefined || this._model === UNAVAILABLE_MODEL) {
                     return {success: false, error:{status:404, message:"No models are configured or available in LLamaStack"}};
                 }
                 console.log("Using model: " + this._model);
