@@ -1,6 +1,12 @@
 import LlamaStackClient from "llama-stack-client";
 import { QueryContext } from "../model/provider";
 
+// Sentinel returned by getModel() when no models were available at lookup
+// time. Callers must treat this as "unresolved", not a cacheable value -
+// caching it as if it were a real model wedges every future conversation
+// until the provider instance is recreated (e.g. a full page reload).
+export const UNAVAILABLE_MODEL = "unavailable";
+
 /**
  * Fetches the model to use, right now defaults based on first
  * available model that llama-stack returns but this needs to be
@@ -36,7 +42,7 @@ export async function getModel(client: LlamaStackClient, context: QueryContext):
             return context.settings.model;
         } else if (availableModels.length === 0) {
             console.warn('No available models in llama-stack available for use.');
-            return "unavailable";
+            return UNAVAILABLE_MODEL;
         } else {
             return availableModels[0];
         }
