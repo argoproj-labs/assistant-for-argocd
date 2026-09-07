@@ -20,14 +20,21 @@ export async function getModel(client: LlamaStackClient, context: QueryContext):
         // const providers = await client.providers.list();
         // console.log(providers);
 
-        // Simple implementation to use first available model if one wasn't configured
+        // ogx-server's GET /v1/models always returns the OpenAI-compatible shape
+        // (id, custom_metadata.model_type) unless Anthropic/Google SDK detection
+        // headers are present - there is no way to get the older native llama-stack
+        // shape (identifier, model_type top-level) from this endpoint. Read both so
+        // this works whether the backend returns the native or OpenAI-compat shape.
         const availableModels = (await client.models.list())
-            .filter((model: any) =>
-                model.model_type === 'llm' &&
-                !model.identifier.includes('guard') &&
-                !model.identifier.includes('405')
-            )
-            .map((model: any) => model.identifier);
+            .filter((model: any) => {
+                const modelType = model.model_type ?? model.custom_metadata?.model_type;
+                const identifier = model.identifier ?? model.id;
+                return modelType === 'llm' &&
+                    identifier != undefined &&
+                    !identifier.includes('guard') &&
+                    !identifier.includes('405');
+            })
+            .map((model: any) => model.identifier ?? model.id);
 
         console.log("Available Models from Llama-Stack");
         console.log(availableModels);
