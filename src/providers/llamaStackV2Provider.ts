@@ -121,7 +121,21 @@ export class LlamaStackV2Provider implements QueryProvider {
         //     ],
         // };
 
-        const stream: Stream<ResponseObjectStream> = await this._client.responses.create(responseParams);
+        // this._client.responses.create() is hardcoded to POST /v1/openai/v1/responses
+        // (llama-stack-client v0.3.2, resources/responses/responses.ts), mirroring
+        // upstream llama-stack's OpenAI-compat namespace. The ogx-server backend only
+        // ever mounts the Responses API natively at /v1/responses (see
+        // ogx-ai/ogx: src/ogx_api/responses/fastapi_routes.py, router prefix "v1" +
+        // "/responses", no /openai/v1 nesting) so the SDK method 404s. Bypass the
+        // resource wrapper and hit the correct path directly via the same underlying
+        // APIClient.post() the generated method itself uses.
+        const stream: Stream<ResponseObjectStream> = await this._client.post<
+            ResponseCreateParamsStreaming,
+            Stream<ResponseObjectStream>
+        >("/v1/responses", {
+            body: responseParams,
+            stream: true,
+        });
 
         let text = '';
         let responseID = '';
